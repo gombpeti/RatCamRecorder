@@ -260,13 +260,59 @@ The Arduino IDE's Serial Monitor, or another instance, is holding the port.
 
 ---
 
-## Third-party components
+## Licence
 
-| component | licence |
-|---|---|
-| Basler pylon SDK | proprietary — see Basler's licence terms. The installer redistributes the pylon runtime, which is subject to those terms. |
-| FFmpeg (libavcodec, libavformat, libswscale) | LGPL/GPL depending on build configuration |
-| Qt 6 | LGPLv3 / commercial |
+RatCam Recorder is licensed under the **GNU General Public License v3.0** — see
+[`LICENSE`](LICENSE).
+
+GPLv3 is required rather than merely chosen: the FFmpeg libraries this links
+against are built with `--enable-gpl --enable-version3`, which places them under
+GPLv3, and the combined work must therefore be GPLv3-compatible.
+
+### Additional permission under GNU GPL version 3, section 7
+
+> If you modify this Program, or any covered work, by linking or combining it
+> with the Basler pylon Camera Software Suite (or a modified version of that
+> library), containing parts covered by the terms of Basler's licence, the
+> licensors of this Program grant you additional permission to convey the
+> resulting work.
+
+This exception exists because pylon is proprietary and cannot be relicensed
+under the GPL, while the camera hardware cannot be used without it.
+
+### Third-party components
+
+| component | licence | reference |
+|---|---|---|
+| **FFmpeg** (libavcodec, libavformat, libswscale, libavutil, libswresample) | **GPLv3** as built here | [ffmpeg.org/legal.html](https://ffmpeg.org/legal.html) |
+| **x264** | GPLv2+ | [videolan.org/developers/x264.html](https://www.videolan.org/developers/x264.html) |
+| **x265** | GPLv2+ | [bitbucket.org/multicoreware/x265](https://bitbucket.org/multicoreware/x265) |
+| **Qt 6** | LGPLv3 / commercial | [qt.io/licensing](https://www.qt.io/licensing/) |
+| **Basler pylon SDK** | proprietary | Basler's licence terms, supplied with the SDK |
+
+> FFmpeg is LGPLv2.1+ by default. It becomes GPL when built with
+> `--enable-gpl`, and version 3 of that licence when built with
+> `--enable-version3`. Both apply to the build used here.
+
+### FFmpeg source availability
+
+GPLv3 section 6 requires that the source of the GPL libraries distributed with a
+binary be made available. The FFmpeg build bundled in the installer is:
+
+```
+ffmpeg version N-126782-gdc52424419-20260923
+configured with: --enable-gpl --enable-version3 --enable-libx264 --enable-libx265
+```
+
+Its complete source is the corresponding upstream revision,
+[`dc52424419`](https://git.ffmpeg.org/gitweb/ffmpeg.git/commit/dc52424419), from
+<https://git.ffmpeg.org/ffmpeg.git>.
+
+> Building FFmpeg with `--disable-gpl --disable-libx264 --disable-libx265
+> --enable-nvenc` instead yields an LGPL build. GPU encoding (`h264_nvenc`, the
+> default) still works; only the `libx264` CPU fallback is lost.
+
+### Prior art
 
 Metadata output is deliberately compatible with
 [campy](https://github.com/ksseverson57/campy), so analysis written against it
