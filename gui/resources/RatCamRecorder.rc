@@ -1,0 +1,3 @@
+// Windows executable icon. IDI_ICON1 is conventionally the first icon, which
+// is the one Explorer and the taskbar display for the .exe itself.
+IDI_ICON1 ICON "ratcam.ico"

@@ -1,0 +1,44 @@
+# Build output
+build/
+out/
+cmake-build-*/
+
+# The installer is large; publish it as a GitHub Release asset instead
+packaging/dist/
+
+# Visual Studio / CMake
+.vs/
+CMakeCache.txt
+CMakeFiles/
+CMakeUserPresets.json
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+*.dir/
+
+# Qt
+*.moc
+moc_*.cpp
+qrc_*.cpp
+ui_*.h
+
+# Python helper
+__pycache__/
+*.pyc
+
+# Editors / OS
+.idea/
+*.swp
+Thumbs.db
+desktop.ini
+
+# Recorded sessions must never be committed
+*.mp4
+*.npy
+*.mat
+frameinfo.csv
+frametimes.csv
+dropped.csv
+gaps.csv
+session_report.txt
