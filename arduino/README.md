@@ -7,8 +7,12 @@ frame counter on USART1 in synchronous mode for an external logger.
 
 | sketch | status |
 |---|---|
-| `trigger_h7_CAM_Sync_Alexei_v3/` | **current** — used for all verified recordings |
-| `trigger_h7_CAM_Sync_Alexei_v2/` | previous version, kept for reference |
+| `trigger_h7_CAM_Sync_Alexei_v4/` | **current** — repeats the logger STOP packet |
+| `trigger_h7_CAM_Sync_Alexei_v3/` | all camera recordings to date were made with this |
+| `trigger_h7_CAM_Sync_Alexei_v2/` | kept for reference |
+
+Each version is a copy, never an edit in place, so whatever is flashed on the
+board stays recoverable.
 
 > ⚠️ **The USART1 synchronous section is verified against external hardware that
 > is not visible from the code** — `setupUSART1_Sync()`, the BRR divisor,
@@ -67,6 +71,40 @@ frame rates by the host software.
 During a settle window the sync pins stay LOW and USART1 is idle. The START
 packet goes out on USART1 *before* the window, so downstream equipment is armed
 and steady before the first camera trigger arrives.
+
+---
+
+## Stopping the electrophysiology logger
+
+The same USART1 line carries four fixed 8-byte control packets:
+
+| mode | packet | meaning |
+|---|---|---|
+| 0 | `1,1,17,17,33,33,46,46` | START |
+| 1 | `1,1,17,17,33,33,49,49` | **STOP** — shuts the logger down |
+| 2 | `1,1,17,17,33,33,206,206` | LED on |
+| 3 | `1,1,17,17,33,33,209,209` | LED off |
+
+**New in v4:** the STOP packet is sent **5 times, 2 s apart** (8 s from first to
+last) rather than once. A single packet can be missed if the logger is busy or
+mid-write, and a missed stop leaves it recording after the session has ended.
+
+```c
+const uint8_t  STOP_REPEATS       = 5;
+const uint32_t STOP_REPEAT_GAP_MS = 2000;
+```
+
+Change those two constants to adjust the count or spacing.
+
+The repeats are scheduled from `loop()` rather than with `delay()`, so the board
+stays responsive to serial commands throughout, and they continue past the stop
+settle window. **A new START cancels any still pending** — otherwise starting a
+session within 8 s of stopping would shut the logger down mid-recording.
+
+The host closes the serial port immediately after sending `1,39,0`, so most of
+the repeats happen with no host attached. Their logging is therefore guarded
+with `if (Serial)`: writing to a disconnected USB CDC risks stalling the board,
+and the packet matters while the log line does not.
 
 ---
 
